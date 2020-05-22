@@ -94,8 +94,15 @@ class ElasticFeatureTypeBuilder extends SimpleFeatureTypeBuilder {
                                 attributeBuilder.buildDescriptor(
                                         attributeName, attributeBuilder.buildType());
                     }
-                    if (att != null && attribute.getDateFormat() != null) {
-                        att.getUserData().put(DATE_FORMAT, attribute.getDateFormat());
+                    if (att != null && attribute.getValidDateFormats() != null) {
+                        // This is somehow not parsing shit correctly
+                        LOGGER.warning(
+                                "[EFTB] Putting these valid date formats: "
+                                        + attribute.getValidDateFormats());
+                        att.getUserData().put(DATE_FORMAT, attribute.getValidDateFormats());
+                        LOGGER.warning(
+                                "[EFTB] Now this is what we get back: "
+                                        + att.getUserData().get(DATE_FORMAT));
                     }
                     if (att != null) {
                         att.getUserData().put(FULL_NAME, attribute.getName());

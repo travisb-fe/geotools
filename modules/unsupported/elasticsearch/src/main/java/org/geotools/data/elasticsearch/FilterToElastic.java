@@ -1196,9 +1196,21 @@ class FilterToElastic implements FilterVisitor, ExpressionVisitor {
     private void updateDateFormatter(AttributeDescriptor attType) {
         dateFormatter = DEFAULT_DATE_FORMATTER;
         if (attType != null) {
-            final String format = (String) attType.getUserData().get(ElasticConstants.DATE_FORMAT);
-            if (format != null) {
-                dateFormatter = Joda.forPattern(format).printer();
+            final List<String> valid_formats =
+                    (List<String>) attType.getUserData().get(ElasticConstants.DATE_FORMAT);
+            if (valid_formats != null) {
+                for (String format : valid_formats) {
+                    try {
+                        dateFormatter = Joda.forPattern(format).printer();
+                        break;
+                    } catch (Exception e) {
+                        LOGGER.fine(
+                                "Unable to parse date format ('" + format + "') for " + attType);
+                    }
+                }
+            }
+            if (dateFormatter == null) {
+                dateFormatter = DEFAULT_DATE_FORMATTER;
             }
         }
     }

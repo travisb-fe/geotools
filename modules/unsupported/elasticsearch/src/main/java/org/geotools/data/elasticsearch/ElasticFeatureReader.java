@@ -169,11 +169,40 @@ class ElasticFeatureReader implements FeatureReader<SimpleFeatureType, SimpleFea
                 } else if (dataVal instanceof Long) {
                     builder.set(name, new Date((long) dataVal));
                 } else {
-                    final String format =
-                            (String) descriptor.getUserData().get(ElasticConstants.DATE_FORMAT);
-                    final DateTimeFormatter dateFormatter = Joda.forPattern(format).parser();
+                    final List<String> valid_formats =
+                            (List<String>)
+                                    descriptor.getUserData().get(ElasticConstants.DATE_FORMAT);
+                    LOGGER.warning("[EFR] we got these formats: " + valid_formats);
+                    DateTimeFormatter dateFormatter = null;
+                    Date date = null;
+                    String format_we_used = "";
+                    if (!(valid_formats == null) && !(valid_formats.isEmpty())) {
+                        for (String format : valid_formats) {
+                            try {
+                                dateFormatter = Joda.forPattern(format).parser();
+                                date = dateFormatter.parseDateTime((String) dataVal).toDate();
+                                format_we_used = format;
+                                break;
+                            } catch (Exception e) {
+                                LOGGER.fine(
+                                        "Unable to parse date format ('"
+                                                + format
+                                                + "') for "
+                                                + descriptor);
+                            }
+                        }
+                    }
+                    if (dateFormatter == null) {
+                        LOGGER.fine("Unable to find any valid date format for " + descriptor);
+                        dateFormatter = Joda.forPattern("date_optional_time").parser();
+                    }
+                    if (date == null) {
+                        LOGGER.fine("Unable to find any valid date format for " + dataVal);
+                        date = dateFormatter.parseDateTime((String) dataVal).toDate();
+                    }
+                    LOGGER.warning(
+                            "[EFR] This is the format we thought matched: " + format_we_used);
 
-                    Date date = dateFormatter.parseDateTime((String) dataVal).toDate();
                     builder.set(name, date);
                 }
             } else if (values != null && values.size() == 1) {

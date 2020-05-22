@@ -390,23 +390,54 @@ public class ElasticDataStore extends ContentDataStore {
                     binding = Boolean.class;
                     break;
                 case "date":
-                    String format = (String) map.get("format");
-                    if (format != null) {
-                        try {
-                            Joda.forPattern(format);
-                        } catch (Exception e) {
-                            LOGGER.fine(
-                                    "Unable to parse date format ('"
-                                            + format
-                                            + "') for "
-                                            + propertyKey);
-                            format = null;
+                    List<String> valid_formats = new ArrayList<String>();
+                    String available_format = (String) map.get("format");
+                    String mock_format =
+                            "yyyy-MM-ddTHH:mm:ssZ||date_optional_time||yyyy-MM-dd HH:mm:ss";
+                    // available_format = mock_format;
+                    if (available_format == null) {
+                        valid_formats.add("date_optional_time");
+                    } else {
+                        if (!available_format.contains("||")) {
+                            LOGGER.warning("[EDS] Trying format: " + available_format);
+                            try {
+                                Joda.forPattern(available_format);
+                                valid_formats.add(available_format);
+                            } catch (Exception e) {
+                                LOGGER.fine(
+                                        "Unable to parse date format ('"
+                                                + available_format
+                                                + "') for "
+                                                + propertyKey);
+                            }
+                        } else {
+                            String[] formats = available_format.split("\\|\\|");
+                            LOGGER.warning("[EDS] Here's our formats: " + formats);
+                            for (String format : formats) {
+                                LOGGER.warning("[EDS] Trying format: " + format);
+                                try {
+                                    Joda.forPattern(format);
+                                    valid_formats.add(format);
+                                } catch (Exception e) {
+                                    LOGGER.fine(
+                                            "Unable to parse date format ('"
+                                                    + format
+                                                    + "') for "
+                                                    + propertyKey);
+                                }
+                            }
                         }
                     }
-                    if (format == null) {
-                        format = "date_optional_time";
+                    if (valid_formats.isEmpty() || valid_formats == null) {
+                        valid_formats.add("date_optional_time");
                     }
-                    elasticAttribute.setDateFormat(format);
+                    LOGGER.warning("[EDS] valid formats we got: " + valid_formats);
+                    List<String> mock_formats = new ArrayList<String>();
+                    mock_formats.add("yyyy-MM-dd HH:mm:ss");
+                    mock_formats.add("date_optional_time");
+                    mock_formats.add("yyyy-MM-ddTHH:mm:ssZ");
+                    // LOGGER.warning("[EDS] setting this mock value: " + mock_formats);
+                    elasticAttribute.setValidDateFormats(valid_formats);
                     binding = Date.class;
                     break;
                 case "binary":
