@@ -19,6 +19,7 @@ package org.geotools.data.elasticsearch;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.regex.Pattern;
+import java.util.List;
 
 /**
  * Class describing and Elasticsearch attribute including name, type and optional information on
@@ -52,7 +53,7 @@ public class ElasticAttribute implements Serializable, Comparable<ElasticAttribu
 
     private Integer srid;
 
-    private String dateFormat;
+    private List<String> validDateFormats;
 
     private Boolean analyzed;
 
@@ -81,7 +82,7 @@ public class ElasticAttribute implements Serializable, Comparable<ElasticAttribu
         this.use = other.use;
         this.defaultGeometry = other.defaultGeometry;
         this.srid = other.srid;
-        this.dateFormat = other.dateFormat;
+        this.validDateFormats = other.validDateFormats;
         this.useShortName = other.useShortName;
         this.geometryType = other.geometryType;
         this.analyzed = other.analyzed;
@@ -151,12 +152,12 @@ public class ElasticAttribute implements Serializable, Comparable<ElasticAttribu
         this.srid = srid;
     }
 
-    public String getDateFormat() {
-        return dateFormat;
+    public List<String> getValidDateFormats() {
+        return validDateFormats;
     }
 
-    public void setDateFormat(String dateFormat) {
-        this.dateFormat = dateFormat;
+    public void setValidDateFormats(List<String> validDateFormats) {
+        this.validDateFormats = validDateFormats;
     }
 
     public Boolean getAnalyzed() {
@@ -217,7 +218,7 @@ public class ElasticAttribute implements Serializable, Comparable<ElasticAttribu
                 use,
                 defaultGeometry,
                 srid,
-                dateFormat,
+                validDateFormats,
                 useShortName,
                 geometryType,
                 analyzed,
@@ -239,7 +240,7 @@ public class ElasticAttribute implements Serializable, Comparable<ElasticAttribu
             equal &= Objects.equals(use, other.use);
             equal &= Objects.equals(defaultGeometry, other.defaultGeometry);
             equal &= Objects.equals(srid, other.srid);
-            equal &= Objects.equals(dateFormat, other.dateFormat);
+            equal &= Objects.equals(validDateFormats, other.validDateFormats);
             equal &= Objects.equals(useShortName, other.useShortName);
             equal &= Objects.equals(geometryType, other.geometryType);
             equal &= Objects.equals(analyzed, other.analyzed);
