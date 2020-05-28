@@ -17,9 +17,9 @@
 package org.geotools.data.elasticsearch;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
-import java.util.List;
 
 /**
  * Class describing and Elasticsearch attribute including name, type and optional information on
